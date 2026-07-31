@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="max-w-sm mx-auto mt-10">
+    <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Login</h2>
+
+        <div id="errorBox" class="hidden bg-red-100 text-red-700 text-sm px-3 py-2 rounded mb-3"></div>
+
+        <label class="block text-sm text-gray-600 mb-1">Email</label>
+        <input type="email" id="email"
+               class="w-full border border-gray-300 rounded-md px-3 py-2 mb-3 text-sm">
+
+        <label class="block text-sm text-gray-600 mb-1">Password</label>
+        <input type="password" id="password"
+               class="w-full border border-gray-300 rounded-md px-3 py-2 mb-4 text-sm">
+
+        <button onclick="login()"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-md transition">
+            Login
+        </button>
+
+        <p class="text-sm text-gray-500 mt-4 text-center">
+            Account nahi hai? <a href="/signup" class="text-blue-600 underline">Signup</a>
+        </p>
+    </div>
+</div>
+
+<script>
+    async function login() {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        const errorBox = document.getElementById("errorBox");
+        errorBox.classList.add("hidden");
+
+        const res = await fetch("/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            localStorage.setItem("access_token", data.access_token);
+            window.location.href = "/dashboard";
+        } else {
+            errorBox.textContent = data.detail || "Login failed";
+            errorBox.classList.remove("hidden");
+        }
+    }
+</script>
+{% endblock %}

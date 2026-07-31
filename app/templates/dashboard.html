@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h2 class="text-2xl font-bold text-gray-800 mb-4">My Documents</h2>
+
+<div id="auth-warning" class="hidden bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-4">
+    You're not logged in. <a href="/docs" class="underline font-medium">Use /docs to login first</a>, token localStorage mein save karo.
+</div>
+
+<div class="bg-white shadow rounded-lg p-5 mb-6">
+    <h5 class="font-semibold text-gray-700 mb-3">Upload PDF</h5>
+    <input type="file" id="fileInput" accept=".pdf"
+           class="block w-full text-sm text-gray-600 border border-gray-300 rounded-md mb-3
+                  file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0
+                  file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+    <button onclick="uploadFile()"
+            class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md transition">
+        Upload
+    </button>
+    <div id="uploadStatus" class="mt-2 text-sm text-gray-600"></div>
+</div>
+
+<div class="bg-white shadow rounded-lg overflow-hidden">
+    <table class="w-full text-left text-sm">
+        <thead class="bg-gray-100 text-gray-700">
+            <tr>
+                <th class="px-4 py-3">Filename</th>
+                <th class="px-4 py-3">Size (KB)</th>
+                <th class="px-4 py-3">Uploaded At</th>
+                <th class="px-4 py-3">Action</th>
+            </tr>
+        </thead>
+        <tbody id="documentsTableBody" class="divide-y divide-gray-100"></tbody>
+    </table>
+</div>
+
+<script>
+    // NOTE: Ye simplest possible auth approach hai (localStorage mein raw token).
+    // Production apps mein httpOnly cookies zyada secure hote hain (XSS se JS token
+    // chura nahi sakta). Abhi seekhne ke liye localStorage simple aur samajhne mein aasan hai.
+    const token = localStorage.getItem("access_token");
+
+    if (!token) {
+        document.getElementById("auth-warning").classList.remove("hidden");
+    }
+
+    async function loadDocuments() {
+        if (!token) return;
+
+        const res = await fetch("/documents", {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (!res.ok) {
+            console.error("Failed to load documents");
+            return;
+        }
+
+        const docs = await res.json();
+        const tbody = document.getElementById("documentsTableBody");
+        tbody.innerHTML = "";
+
+        docs.forEach(doc => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td class="px-4 py-3">${doc.original_filename}</td>
+                <td class="px-4 py-3">${(doc.file_size / 1024).toFixed(1)}</td>
+                <td class="px-4 py-3">${new Date(doc.uploaded_at).toLocaleString()}</td>
+                <td class="px-4 py-3">
+                    <button onclick="deleteDocument(${doc.id})"
+                            class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded-md transition">
+                        Delete
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    async function uploadFile() {
+        const fileInput = document.getElementById("fileInput");
+        const statusDiv = document.getElementById("uploadStatus");
+
+        if (!fileInput.files.length) {
+            statusDiv.textContent = "Pehle ek file select karo.";
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+
+        statusDiv.textContent = "Uploading...";
+
+        const res = await fetch("/documents/upload", {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${token}` },
+            body: formData
+        });
+
+        if (res.ok) {
+            statusDiv.textContent = "Uploaded successfully!";
+            fileInput.value = "";
+            loadDocuments();
+        } else {
+            const err = await res.json();
+            statusDiv.textContent = "Error: " + err.detail;
+        }
+    }
+
+    async function deleteDocument(docId) {
+        if (!confirm("Sure delete karna hai?")) return;
+
+        const res = await fetch(`/documents/${docId}`, {
+            method: "DELETE",
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (res.ok) {
+            loadDocuments();
+        } else {
+            alert("Delete failed");
+        }
+    }
+
+    loadDocuments();
+</script>
+{% endblock %}
