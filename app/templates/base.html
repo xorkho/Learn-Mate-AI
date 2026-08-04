@@ -3,16 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}AI Document Assistant{% endblock %}</title>
+    <title>{% block title %}Study Assistant{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 min-h-screen">
-    <nav class="bg-gray-900 text-white px-6 py-4">
-        <span class="text-lg font-semibold">AI Document Assistant</span>
-    </nav>
-
-    <div class="max-w-4xl mx-auto mt-8 px-4">
-        {% block content %}{% endblock %}
+    <div class="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200">
+        <a href="/dashboard" class="text-lg font-bold text-blue-600">Study Assistant</a>
+        <nav class="text-sm">
+            <a href="/dashboard" class="text-gray-600 hover:text-gray-900 mr-6">My Documents</a>
+            <a href="#" onclick="signOut()" class="text-red-500 hover:text-red-700">Sign out</a>
+        </nav>
     </div>
+
+    {% block content %}{% endblock %}
+
+    <script>
+        function getToken() {
+            return localStorage.getItem("access_token");
+        }
+
+        function authHeaders() {
+            return { "Authorization": "Bearer " + getToken() };
+        }
+
+        function signOut() {
+            localStorage.removeItem("access_token");
+            window.location.href = "/login";
+        }
+
+        if (!getToken() && window.location.pathname !== "/login" && window.location.pathname !== "/signup") {
+            window.location.href = "/login";
+        }
+    </script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

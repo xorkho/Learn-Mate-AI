@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+<div class="text-center mt-20 max-w-4xl mx-auto px-6">
+
+    <!-- Website Name -->
+    <h1 class="text-5xl font-extrabold text-gray-900 mb-6">
+        AI Document Assistant
+    </h1>
+
+    <!-- Description -->
+    <p class="text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto mb-10">
+        Upload your PDF documents and interact with them using AI. Ask questions,
+        generate concise summaries, and create quizzes instantly—all from a simple
+        and intuitive interface designed to make learning and document analysis effortless.
+    </p>
+
+    <!-- CTA Button -->
+    <a href="/signup"
+       class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg shadow-md transition duration-300">
+        Get Started
+    </a>
+
+</div>
+{% endblock %}

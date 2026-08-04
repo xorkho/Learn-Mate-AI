@@ -17,6 +17,8 @@ from app.config import settings
 # Humare saare models yahan import karna zaroori hai, taake Base.metadata
 # unhe "dekh" sake. Import na kiya to Alembic unhe migrations mein include nahi karega.
 from app.models.user import User  # noqa: F401
+from app.models.documents import Document
+from app.models.chat_message import ChatMessage
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

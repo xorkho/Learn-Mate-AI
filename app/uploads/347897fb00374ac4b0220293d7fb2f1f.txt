@@ -1,0 +1,196 @@
+MVP MODERN BARBERS - KNOWLEDGE BASE DOCUMENT
+Source Website: https://mvpmodernbarbers.co/
+Scrape Date: July 31, 2026
+Purpose: Reference content for RAG chatbot ingestion
+
+=====================================================
+1. BUSINESS OVERVIEW
+=====================================================
+
+Business Name: MVP Modern Barbers
+Tagline: "More Than a Cut, It's a Statement"
+Type: Contemporary Canadian barbershop chain
+
+Description: MVP Modern Barbers is a contemporary Canadian barbershop chain that brings a luxury salon experience to men's grooming. It blends premium styling services with a relaxed, sports-focused atmosphere, offering everything from classic haircuts to hot straight shaves.
+
+Brand Highlights:
+- MVP Stylists: trained professional barbers
+- Digital Check-in: walk-in queue system, no appointment required
+- Scalp Massage: included in premium service
+- Hot Towel Finish
+- Service Guarantee
+- MVP Lookbook: style inspiration gallery
+
+Website: https://mvpmodernbarbers.co
+
+=====================================================
+2. SERVICES OFFERED
+=====================================================
+
+Service: Hall of Fame Haircut
+Description: A relaxing, full-service haircut experience for classic cuts, fades, or buzz cuts. Includes: consultation, hot face towel, scalp massage, hair wash, cut and style, and complimentary neck trims between cuts. Bookable online through each location's booking link.
+
+Service: Hot Straight Shave
+Description: Includes lubricating shave oil treatment, hot towels, moisturizing shave cream and hot lather shave, cool towels, and a post-shave cooling lotion treatment.
+
+Service: Colour & Camouflage
+Description: For clients wanting to change their look, covers grey hair or gives a full colour change, using long-lasting permanent colour applied to every hair.
+
+=====================================================
+3. LOCATIONS
+=====================================================
+
+--- Location: Fort McMurray, AB ---
+Address: 15 - 8520 Manning Ave, Fort McMurray, AB
+Phone: +1 780-838-2888
+Estimated Wait: approximately 10 minutes
+Details Page: https://mvpmodernbarbers.co/locations/fort-mcmurray/
+Book Online: http://online.getsquire.com/book/mvp-modern-barbers-fort-mcmurray-fort-mcmurray
+
+--- Location: Moncton, NB ---
+Address: 165 Main Street, Moncton, NB
+Phone: +1 506-857-4687
+Estimated Wait: approximately 12 minutes
+Details Page: https://mvpmodernbarbers.co/locations/moncton/
+Book Online: https://getsquire.com/booking/book/mvp-modern-barbers-moncton-moncton
+
+--- Location: Halifax, NS ---
+Address: #7 - 80 Hogan Court, Halifax, NS
+Phone: +1 902-876-9999
+Estimated Wait: approximately 6-8 minutes
+Details Page: https://mvpmodernbarbers.co/locations/halifax/
+Book Online: https://getsquire.com/booking/book/mvp-modern-barbers-halifax-larry-uteck-halifax
+
+--- Location: Saskatoon, SK ---
+Address: #73 - 139 Gibson Bend, Saskatoon, SK, S0K 2T0
+Phone: +1 306-986-7350
+Estimated Wait: approximately 15 minutes
+Hours: Tuesday to Friday 10am-7pm, Saturday 9am-5pm, Sunday and Monday Closed
+Nearby: Starbucks, The Keg, Crumbl Cookies
+Details Page: https://mvpmodernbarbers.co/locations/saskaton/
+Book Online: https://getsquire.com/booking/book/mvp-modern-barbers-saskatoon-saskatoon
+
+--- Location: Toronto (Fort York) ---
+Address: 170 Fort York Blvd, Toronto, ON M5V 0E6, Canada
+Phone: +1 416-591-7193
+Hours: Monday to Thursday 10am-7pm, Friday and Saturday 10am-8pm, Sunday 10am-6pm
+Walk-ins: No appointment needed, choose service and preferred barber
+Details Page: https://mvpmodernbarbers.co/locations/toronto/
+Book Online: https://getsquire.com/booking/book/mvp-modern-barbers-fort-york-toronto
+
+Note: The general locations listing page shows summary shop cards; individual location detail pages contain the most accurate hours and contact info for each shop.
+
+=====================================================
+4. CONTACT INFORMATION (HEAD OFFICE)
+=====================================================
+
+Email: admin@mvpmodernbarbers.ca
+Phone: +1 (289) 981-7288
+Head Office: 105 Gordon Baker Rd, Toronto, Ontario, Suite 722, M2H 3P
+Downtown Office: 26 Alexander St, Toronto, ON M4Y 1B4
+Contact Page: https://mvpmodernbarbers.co/contact-us/ (contact form fields: Name, Subject, Email, Phone, Message)
+
+=====================================================
+5. SOCIAL MEDIA
+=====================================================
+
+Facebook: https://www.facebook.com/mvpmodernbarbers/
+Instagram: https://www.instagram.com/mvpmodernbarber.ca
+TikTok: https://www.tiktok.com/@mvpmodernbarbers.ca
+Pinterest: https://www.pinterest.com/mvpmodernbarber
+YouTube: https://www.youtube.com/@MVPModernbarbers
+
+=====================================================
+6. MOBILE APP
+=====================================================
+
+MVP Modern Barbers offers a mobile app for booking, digital check-in, and account management.
+
+iOS (App Store): https://apps.apple.com/ca/app/mvp-modern-barbers/id1548533399
+Android (Google Play): https://play.google.com/store/apps/details?id=com.getsquire.SquireMVPModernBarbers&hl=en
+App Info Page: https://mvpmodernbarbers.co/mvp-app/
+
+=====================================================
+7. PRODUCTS (SHOP ONLINE)
+=====================================================
+
+Featured "Favourite Products" from MVP's own grooming line:
+- Matte Clay: styling clay for a matte finish hold
+- Texture Paste: for textured styles
+- Smooth Fusion: smoothing product
+- Organic Shave Cream: for shaving routine
+
+Shop Online Page: https://mvpmodernbarbers.co/shop-online/
+
+=====================================================
+8. FRANCHISING
+=====================================================
+
+MVP Modern Barbers offers franchise opportunities across Canada.
+
+Franchising Page: https://mvpmodernbarbers.co/franchising/
+Available Locations (for franchise): https://mvpmodernbarbers.co/available-locations/
+Franchise Application Form: https://form.jotform.com/261647753876473
+Franchise Presentation (PDF): https://mvpmodernbarbers.co/wp-content/uploads/2026/05/MVP-Barber-Profile.pdf
+
+=====================================================
+9. CAREERS
+=====================================================
+
+MVP Modern Barbers hires barbers and stylists at its locations.
+Careers Page: https://mvpmodernbarbers.co/careers/
+
+=====================================================
+10. BLOG / CONTENT
+=====================================================
+
+MVP publishes blog content around style tips, seasonal grooming trends, and new products.
+Blog Page: https://mvpmodernbarbers.co/the-mvp-blogs/
+
+=====================================================
+11. POLICIES
+=====================================================
+
+Privacy Policy: https://mvpmodernbarbers.co/privacy-policy/
+Refund Policy: linked in site footer (direct URL not captured in this scrape)
+Shipping Policy: linked in site footer (direct URL not captured in this scrape)
+
+=====================================================
+12. SITE NAVIGATION MAP
+=====================================================
+
+Home: https://mvpmodernbarbers.co/
+Services: https://mvpmodernbarbers.co/services/
+Locations: https://mvpmodernbarbers.co/locations/ (Fort McMurray, Halifax, Moncton, Saskatoon, Toronto)
+About: https://mvpmodernbarbers.co/about/ (Careers, MVP App, Blogs)
+Franchising: https://mvpmodernbarbers.co/franchising/ (Available Locations, Application Form, Presentation PDF)
+Shop Online: https://mvpmodernbarbers.co/shop-online/
+Contact: https://mvpmodernbarbers.co/contact-us/
+
+=====================================================
+13. SAMPLE Q&A PAIRS (FOR RAG BOT TESTING)
+=====================================================
+
+Q: What is MVP Modern Barbers?
+A: MVP Modern Barbers is a Canadian barbershop chain that offers a luxury salon experience for men's grooming, from classic haircuts to hot straight shaves.
+
+Q: What services does MVP offer?
+A: The Hall of Fame Haircut, Hot Straight Shave, and Colour & Camouflage.
+
+Q: Which cities have MVP locations?
+A: Fort McMurray (AB), Halifax (NS), Moncton (NB), Saskatoon (SK), and Toronto (ON - Fort York).
+
+Q: Do I need an appointment, or are walk-ins accepted?
+A: Most locations accept walk-ins (for example, Toronto Fort York), and online booking is also available for every location.
+
+Q: What is the head office contact number?
+A: Head office phone: +1 (289) 981-7288, Email: admin@mvpmodernbarbers.ca
+
+Q: How can someone apply for an MVP franchise?
+A: Visit the Franchising page (https://mvpmodernbarbers.co/franchising/) and fill out the Application Form: https://form.jotform.com/261647753876473
+
+=====================================================
+END OF DOCUMENT
+=====================================================
+
+This document was compiled from the Home, Services, About, Locations, Toronto location detail, and Contact Us pages of mvpmodernbarbers.co. Individual location detail pages for Halifax and Moncton, as well as blog posts and the shop-online product catalog, were not included in this scrape and can be added on request.

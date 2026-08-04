@@ -1,129 +1,129 @@
 {% extends "base.html" %}
-
-{% block title %}Dashboard{% endblock %}
+{% block title %}My Documents · Study Assistant{% endblock %}
 
 {% block content %}
-<h2 class="text-2xl font-bold text-gray-800 mb-4">My Documents</h2>
+<div class="max-w-5xl mx-auto px-6 py-10">
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-gray-800">My Documents</h1>
+        <p class="text-gray-500 text-sm mt-1">Upload a PDF, then chat, summarize, or quiz yourself on it.</p>
+    </div>
 
-<div id="auth-warning" class="hidden bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-4">
-    You're not logged in. <a href="/docs" class="underline font-medium">Use /docs to login first</a>, token localStorage mein save karo.
+    <div class="bg-white shadow rounded-lg p-6 mb-8">
+        <div id="dropzone"
+             class="border-2 border-dashed border-blue-300 rounded-md py-10 px-4 text-center cursor-pointer hover:bg-blue-50 transition">
+            <p class="text-gray-700 font-medium">Click to upload <span class="text-gray-400 font-normal">or drag a PDF here</span></p>
+            <p class="text-gray-400 text-xs mt-1">Max size 10MB · PDF only</p>
+            <input type="file" id="fileInput" accept=".pdf,.txt" class="hidden">
+        </div>
+        <div id="uploadStatus" class="mt-3 text-sm"></div>
+    </div>
+
+    <div id="docGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
 </div>
+{% endblock %}
 
-<div class="bg-white shadow rounded-lg p-5 mb-6">
-    <h5 class="font-semibold text-gray-700 mb-3">Upload PDF</h5>
-    <input type="file" id="fileInput" accept=".pdf"
-           class="block w-full text-sm text-gray-600 border border-gray-300 rounded-md mb-3
-                  file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0
-                  file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-    <button onclick="uploadFile()"
-            class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md transition">
-        Upload
-    </button>
-    <div id="uploadStatus" class="mt-2 text-sm text-gray-600"></div>
-</div>
-
-<div class="bg-white shadow rounded-lg overflow-hidden">
-    <table class="w-full text-left text-sm">
-        <thead class="bg-gray-100 text-gray-700">
-            <tr>
-                <th class="px-4 py-3">Filename</th>
-                <th class="px-4 py-3">Size (KB)</th>
-                <th class="px-4 py-3">Uploaded At</th>
-                <th class="px-4 py-3">Action</th>
-            </tr>
-        </thead>
-        <tbody id="documentsTableBody" class="divide-y divide-gray-100"></tbody>
-    </table>
-</div>
-
+{% block scripts %}
 <script>
-    // NOTE: Ye simplest possible auth approach hai (localStorage mein raw token).
-    // Production apps mein httpOnly cookies zyada secure hote hain (XSS se JS token
-    // chura nahi sakta). Abhi seekhne ke liye localStorage simple aur samajhne mein aasan hai.
-    const token = localStorage.getItem("access_token");
+const dropzone = document.getElementById("dropzone");
+const fileInput = document.getElementById("fileInput");
+const uploadStatus = document.getElementById("uploadStatus");
+const docGrid = document.getElementById("docGrid");
 
-    if (!token) {
-        document.getElementById("auth-warning").classList.remove("hidden");
+dropzone.addEventListener("click", () => fileInput.click());
+
+dropzone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropzone.classList.add("bg-blue-50");
+});
+dropzone.addEventListener("dragleave", () => dropzone.classList.remove("bg-blue-50"));
+dropzone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropzone.classList.remove("bg-blue-50");
+    if (e.dataTransfer.files.length) uploadFile(e.dataTransfer.files[0]);
+});
+
+fileInput.addEventListener("change", () => {
+    if (fileInput.files.length) uploadFile(fileInput.files[0]);
+});
+
+async function uploadFile(file) {
+    const validExtensions = [".pdf", ".txt"];
+    const isValid = validExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
+
+    if (!isValid) {
+        uploadStatus.innerHTML = `<p class="text-red-600">Only PDF and TXT files are allowed.</p>`;
+        return;
     }
 
-    async function loadDocuments() {
-        if (!token) return;
+    uploadStatus.innerHTML = `<p class="text-gray-500">Uploading and indexing "${file.name}"... this can take a moment.</p>`;
 
-        const res = await fetch("/documents", {
-            headers: { "Authorization": `Bearer ${token}` }
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+        const res = await fetch("/documents/upload", {
+            method: "POST",
+            headers: authHeaders(),
+            body: formData,
         });
 
         if (!res.ok) {
-            console.error("Failed to load documents");
-            return;
-        }
-
-        const docs = await res.json();
-        const tbody = document.getElementById("documentsTableBody");
-        tbody.innerHTML = "";
-
-        docs.forEach(doc => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td class="px-4 py-3">${doc.original_filename}</td>
-                <td class="px-4 py-3">${(doc.file_size / 1024).toFixed(1)}</td>
-                <td class="px-4 py-3">${new Date(doc.uploaded_at).toLocaleString()}</td>
-                <td class="px-4 py-3">
-                    <button onclick="deleteDocument(${doc.id})"
-                            class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded-md transition">
-                        Delete
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(row);
-        });
-    }
-
-    async function uploadFile() {
-        const fileInput = document.getElementById("fileInput");
-        const statusDiv = document.getElementById("uploadStatus");
-
-        if (!fileInput.files.length) {
-            statusDiv.textContent = "Pehle ek file select karo.";
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append("file", fileInput.files[0]);
-
-        statusDiv.textContent = "Uploading...";
-
-        const res = await fetch("/documents/upload", {
-            method: "POST",
-            headers: { "Authorization": `Bearer ${token}` },
-            body: formData
-        });
-
-        if (res.ok) {
-            statusDiv.textContent = "Uploaded successfully!";
-            fileInput.value = "";
-            loadDocuments();
-        } else {
             const err = await res.json();
-            statusDiv.textContent = "Error: " + err.detail;
+            throw new Error(err.detail || "Upload failed");
         }
+
+        uploadStatus.innerHTML = `<p class="text-green-600">Uploaded successfully.</p>`;
+        fileInput.value = "";
+        loadDocuments();
+    } catch (e) {
+        uploadStatus.innerHTML = `<p class="text-red-600">${e.message}</p>`;
     }
+}
 
-    async function deleteDocument(docId) {
-        if (!confirm("Sure delete karna hai?")) return;
+async function loadDocuments() {
+    try {
+        const res = await fetch("/documents", { headers: authHeaders() });
+        if (!res.ok) throw new Error("Could not load documents");
+        const docs = await res.json();
 
+        if (docs.length === 0) {
+            docGrid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-10">No documents yet — upload your first PDF above.</div>`;
+            return;
+        }
+
+        docGrid.innerHTML = docs.map(doc => `
+            <div class="bg-white shadow rounded-lg p-4 cursor-pointer hover:shadow-md transition" onclick="openWorkspace(${doc.id})">
+                <span class="inline-block text-xs font-medium text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full mb-2">PDF</span>
+                <p class="font-medium text-gray-800 break-words">${doc.original_filename}</p>
+                <div class="flex justify-between items-center text-xs text-gray-400 mt-2">
+                    <span>${(doc.file_size / 1024).toFixed(0)} KB</span>
+                    <span onclick="event.stopPropagation(); deleteDoc(${doc.id})" class="text-red-500 hover:text-red-700 cursor-pointer">Delete</span>
+                </div>
+            </div>
+        `).join("");
+    } catch (e) {
+        docGrid.innerHTML = `<p class="text-red-600">${e.message}</p>`;
+    }
+}
+
+function openWorkspace(docId) {
+    window.location.href = `/workspace/${docId}`;
+}
+
+async function deleteDoc(docId) {
+    if (!confirm("Delete this document? This cannot be undone.")) return;
+    try {
         const res = await fetch(`/documents/${docId}`, {
             method: "DELETE",
-            headers: { "Authorization": `Bearer ${token}` }
+            headers: authHeaders(),
         });
-
-        if (res.ok) {
-            loadDocuments();
-        } else {
-            alert("Delete failed");
-        }
+        if (!res.ok && res.status !== 204) throw new Error("Delete failed");
+        loadDocuments();
+    } catch (e) {
+        alert(e.message);
     }
+}
 
-    loadDocuments();
+loadDocuments();
 </script>
 {% endblock %}

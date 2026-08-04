@@ -10,12 +10,16 @@ from app.models.user import User
 from app.models.documents import Document
 from app.schemas.documents import DocumentOut
 from app.auth.dependencies import get_current_user
+from app.services.pdf_services import extract_text
+from app.services.chunking import chunk_text
+from app.services.embedding import get_embeddings
+from app.services.faiss import save_to_faiss
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
 
 UPLOAD_DIR = "app/uploads"
-MAX_FILE_SIZE = 10 * 1024 * 1024 
-ALLOWED_CONTENT_TYPE = "application/pdf"
+MAX_FILE_SIZE = 10 * 1024 * 1024
+ALLOWED_EXTENSIONS = {".pdf", ".txt"}
 
 
 @router.post("/upload", response_model=DocumentOut, status_code=status.HTTP_201_CREATED)
@@ -25,27 +29,17 @@ def upload_document(
     current_user: User = Depends(get_current_user),
 ):
     # --- Validation 1: Extension check ---
-    if not file.filename.lower().endswith(".pdf"):
+    file_extension = os.path.splitext(file.filename)[1].lower()
+    if file_extension not in ALLOWED_EXTENSIONS:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Only PDF files are allowed",
+            detail="Only PDF and TXT files are allowed",
         )
 
-    # --- Validation 2: Content-Type check ---
-    # Extension aasani se fake ki ja sakti hai (virus.exe ko virus.pdf rename karna),
-    # isliye content_type bhi check karte hain (double layer of defense)
-    if file.content_type != ALLOWED_CONTENT_TYPE:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid file type",
-        )
-
-    # --- Validation 3: Size check ---
-    # file.file ek SpooledTemporaryFile hai — seek/tell se size nikal sakte hain
-    # bina pura file memory mein load kiye
+    # --- Validation 2: Size check ---
     file.file.seek(0, os.SEEK_END)
     file_size = file.file.tell()
-    file.file.seek(0)  # wapas start pe le aao, warna save karte waqt khali file save hogi
+    file.file.seek(0)
 
     if file_size > MAX_FILE_SIZE:
         raise HTTPException(
@@ -53,14 +47,24 @@ def upload_document(
             detail="File too large. Max size is 10MB",
         )
 
-    # --- Unique filename generate karna (collision avoid karne ke liye) ---
-    unique_name = f"{uuid.uuid4().hex}.pdf"
+    # --- Unique filename generate karna (sahi extension ke saath) ---
+    unique_name = f"{uuid.uuid4().hex}{file_extension}"
     destination_path = os.path.join(UPLOAD_DIR, unique_name)
 
     # --- File ko disk pe save karna ---
     os.makedirs(UPLOAD_DIR, exist_ok=True)
     with open(destination_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
+
+    # --- Text extract karo (extension ke hisaab se) ---
+    try:
+        extracted_text = extract_text(destination_path, file_extension)
+    except ValueError as e:
+        os.remove(destination_path)  # invalid file ko disk se hata do
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
 
     # --- DB record banana ---
     new_document = Document(
@@ -69,10 +73,20 @@ def upload_document(
         stored_filename=unique_name,
         file_path=destination_path,
         file_size=file_size,
+        extracted_text=extracted_text,
     )
     db.add(new_document)
     db.commit()
     db.refresh(new_document)
+
+    # --- Chunking ---
+    chunks = chunk_text(extracted_text)
+
+    # --- Embeddings ---
+    embeddings = get_embeddings(chunks)
+
+    # --- FAISS mein save karo ---
+    save_to_faiss(new_document.id, chunks, embeddings)
 
     return new_document
 
@@ -82,7 +96,6 @@ def list_my_documents(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    # Security-critical line: sirf CURRENT USER ke documents, kisi aur ke nahi
     documents = (
         db.query(Document)
         .filter(Document.user_id == current_user.id)
@@ -105,17 +118,12 @@ def delete_document(
             status_code=status.HTTP_404_NOT_FOUND, detail="Document not found"
         )
 
-    # --- Authorization check ---
-    # Sirf 404 dena kaafi nahi — ye check zaroori hai ke document
-    # USSI user ka hai jo delete request kar raha hai. Warna User A,
-    # User B ke document ka ID guess karke uska document delete kar sakta hai.
     if document.user_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You don't have permission to delete this document",
         )
 
-    # Pehle disk se file hatao, phir DB record
     if os.path.exists(document.file_path):
         os.remove(document.file_path)
 

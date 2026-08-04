@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Workspace · Study Assistant{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-6 py-10">
+    <a href="/dashboard" class="text-sm text-gray-500 hover:text-gray-700">&larr; Back to documents</a>
+
+    <div class="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 mt-4">
+        <div class="bg-white shadow rounded-lg p-5 h-fit">
+            <h3 id="docName" class="font-semibold text-gray-800 truncate">Loading...</h3>
+            <p id="docMeta" class="text-xs text-gray-400 mb-4"></p>
+            <div class="flex md:flex-col gap-1">
+                <button class="tab-btn text-left px-3 py-2 rounded-md text-sm font-medium bg-blue-50 text-blue-700" data-panel="chat" onclick="switchTab('chat')">Chat</button>
+                <button class="tab-btn text-left px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-50" data-panel="summary" onclick="switchTab('summary')">Summary</button>
+                <button class="tab-btn text-left px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-50" data-panel="quiz" onclick="switchTab('quiz')">Quiz</button>
+            </div>
+        </div>
+
+        <div>
+            <!-- CHAT PANEL -->
+            <div class="panel" id="panel-chat">
+                <div class="bg-white shadow rounded-lg p-5 flex flex-col" style="min-height: 480px;">
+                    <div class="flex-1 overflow-y-auto flex flex-col gap-3 mb-4" style="max-height: 460px;" id="chatLog">
+                        <div class="bg-gray-100 text-gray-700 rounded-lg px-4 py-3 text-sm max-w-[80%]">
+                            Ask me anything about this document — I'll answer using its content.
+                        </div>
+                    </div>
+                    <div class="flex gap-2 border-t border-gray-100 pt-3">
+                        <input type="text" id="chatInput" placeholder="e.g. What are the key skills mentioned?"
+                               class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button id="sendBtn" onclick="sendMessage()"
+                                class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-md transition">
+                            Send
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUMMARY PANEL -->
+            <div class="panel hidden" id="panel-summary">
+                <div class="bg-white shadow rounded-lg p-6">
+                    <button id="summarizeBtn" onclick="generateSummary()"
+                            class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-md transition">
+                        Generate Summary
+                    </button>
+                    <div id="summaryOutput" class="mt-5 text-sm text-gray-700 leading-relaxed whitespace-pre-wrap"></div>
+                </div>
+            </div>
+
+            <!-- QUIZ PANEL -->
+            <div class="panel hidden" id="panel-quiz">
+                <div class="bg-white shadow rounded-lg p-6">
+                    <div class="flex items-center gap-3">
+                        <button id="quizBtn" onclick="generateQuiz()"
+                                class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-md transition">
+                            Generate Quiz
+                        </button>
+                        <label class="text-sm text-gray-500">
+                            Questions:
+                            <input type="number" id="numQuestions" value="5" min="1" max="10"
+                                   class="w-14 border border-gray-300 rounded-md px-2 py-1 ml-1 text-sm">
+                        </label>
+                    </div>
+                    <div id="quizOutput" class="mt-5"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const documentId = {{ document_id }};
+</script>
+<script src="/static/js/chat.js"></script>
+{% endblock %}
