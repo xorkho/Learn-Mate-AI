@@ -5,12 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Study Assistant{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <div class="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200">
         <a href="/dashboard" class="text-lg font-bold text-blue-600">Study Assistant</a>
-        <nav class="text-sm">
+
+        <!-- Sirf login hone par dikhega -->
+        <nav id="nav-links" class="text-sm hidden">
             <a href="/dashboard" class="text-gray-600 hover:text-gray-900 mr-6">My Documents</a>
+            <a href="/progress" class="text-gray-600 hover:text-gray-900 mr-6">Progress</a>
             <a href="#" onclick="signOut()" class="text-red-500 hover:text-red-700">Sign out</a>
         </nav>
     </div>
@@ -18,6 +24,9 @@
     {% block content %}{% endblock %}
 
     <script>
+        // Public pages jahan bina login ke jana allowed hai
+        const PUBLIC_PATHS = ["/", "/login", "/signup"];
+
         function getToken() {
             return localStorage.getItem("access_token");
         }
@@ -31,9 +40,21 @@
             window.location.href = "/login";
         }
 
-        if (!getToken() && window.location.pathname !== "/login" && window.location.pathname !== "/signup") {
+        // Navbar ko login state ke hisaab se dikhana/chhupana
+        function updateNavbar() {
+            const navLinks = document.getElementById("nav-links");
+            if (getToken()) {
+                navLinks.classList.remove("hidden");
+            } else {
+                navLinks.classList.add("hidden");
+            }
+        }
+
+        if (!getToken() && !PUBLIC_PATHS.includes(window.location.pathname)) {
             window.location.href = "/login";
         }
+
+        updateNavbar();
     </script>
     {% block scripts %}{% endblock %}
 </body>

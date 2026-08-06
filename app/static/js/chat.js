@@ -1,3 +1,9 @@
+const renderer = new marked.Renderer();
+renderer.link = (href, title, text) => {
+    return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">${text}</a>`;
+};
+marked.setOptions({ renderer });
+
 // ---------- Tabs ----------
 function switchTab(name) {
     document.querySelectorAll(".tab-btn").forEach(t => {
@@ -43,10 +49,11 @@ function appendMessage(role, text, sources = null) {
     const div = document.createElement("div");
     if (role === "user") {
         div.className = "bg-blue-600 text-white rounded-lg px-4 py-3 text-sm max-w-[80%] self-end";
+        div.textContent = text;   // user ka apna text, plain rakhna hai
     } else {
-        div.className = "bg-gray-100 text-gray-700 rounded-lg px-4 py-3 text-sm max-w-[80%]";
+        div.className = "bg-gray-100 text-gray-700 rounded-lg px-4 py-3 text-sm max-w-[80%] prose prose-sm max-w-none";
+        div.innerHTML = marked.parse(text);   // ← markdown render karo
     }
-    div.innerHTML = text;
 
     if (sources && sources.length) {
         const src = document.createElement("div");
@@ -137,7 +144,7 @@ async function generateSummary() {
         }
 
         const data = await res.json();
-        output.innerHTML = data.summary;
+        output.innerHTML = marked.parse(data.summary);
     } catch (e) {
         output.innerHTML = `<p class="text-red-600">${e.message}</p>`;
     } finally {
@@ -146,19 +153,24 @@ async function generateSummary() {
 }
 
 // ---------- Quiz ----------
+let currentQuizData = [];   // taake submit ke waqt correct answers/topics yaad rahein
+
 async function generateQuiz() {
     const btn = document.getElementById("quizBtn");
     const output = document.getElementById("quizOutput");
+    const results = document.getElementById("quizResults");
     const numQuestions = parseInt(document.getElementById("numQuestions").value) || 5;
+    const difficulty = document.getElementById("quizDifficulty").value;
 
+    results.classList.add("hidden");
     btn.disabled = true;
-    output.innerHTML = `<p class="text-gray-500">Generating ${numQuestions} questions...</p>`;
+    output.innerHTML = `<p class="text-gray-500">Generating ${numQuestions} ${difficulty} questions...</p>`;
 
     try {
         const res = await fetch("/chat/quiz", {
             method: "POST",
             headers: { ...authHeaders(), "Content-Type": "application/json" },
-            body: JSON.stringify({ document_id: documentId, num_questions: numQuestions }),
+            body: JSON.stringify({ document_id: documentId, num_questions: numQuestions, difficulty }),
         });
 
         if (!res.ok) {
@@ -167,7 +179,8 @@ async function generateQuiz() {
         }
 
         const data = await res.json();
-        renderQuiz(data.questions);
+        currentQuizData = data.questions;
+        renderQuiz(currentQuizData, difficulty);
     } catch (e) {
         output.innerHTML = `<p class="text-red-600">${e.message}</p>`;
     } finally {
@@ -175,11 +188,13 @@ async function generateQuiz() {
     }
 }
 
-function renderQuiz(questions) {
+function renderQuiz(questions, difficulty) {
     const output = document.getElementById("quizOutput");
     output.innerHTML = questions.map((q, qi) => `
-        <div class="quiz-question mb-5 pb-5 border-b border-gray-100" data-qi="${qi}" data-correct="${q.correct_answer}">
-            <div class="font-medium text-gray-800 mb-2 text-sm">${qi + 1}. ${q.question}</div>
+        <div class="quiz-question mb-5 pb-5 border-b border-gray-100" data-qi="${qi}">
+            <div class="font-medium text-gray-800 mb-2 text-sm">${qi + 1}. ${q.question}
+                <span class="text-xs text-gray-400 font-normal">(${q.topic})</span>
+            </div>
             <div class="flex flex-col gap-2">
                 ${q.options.map(opt => `
                     <div class="quiz-option border border-gray-200 rounded-md px-3 py-2 text-sm cursor-pointer hover:border-blue-400 transition"
@@ -188,11 +203,10 @@ function renderQuiz(questions) {
             </div>
         </div>
     `).join("") + `
-        <button onclick="scoreQuiz()"
-                class="border border-gray-300 text-gray-700 hover:border-blue-400 hover:text-blue-600 text-sm font-medium px-4 py-2 rounded-md transition mt-2">
-            Check Answers
+        <button onclick="submitQuiz('${difficulty}')"
+                class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-md transition mt-2">
+            Submit Quiz
         </button>
-        <div id="quizScore" class="mt-3 font-semibold text-gray-800"></div>
     `;
 }
 
@@ -204,36 +218,76 @@ function selectOption(qi, el) {
     el.classList.add("border-blue-500", "bg-blue-50");
 }
 
-function scoreQuiz() {
-    const questions = document.querySelectorAll(".quiz-question");
-    let correct = 0;
+async function submitQuiz(difficulty) {
+    const questionEls = document.querySelectorAll(".quiz-question");
+    const answers = [];
 
-    questions.forEach(q => {
-        const correctAnswer = q.dataset.correct.trim();
-        const selected = q.querySelector(".border-blue-500");
-        const options = q.querySelectorAll(".quiz-option");
-
-        let actualCorrectText = correctAnswer;
-        if (/^[A-D]$/i.test(correctAnswer)) {
-            const index = correctAnswer.toUpperCase().charCodeAt(0) - 65;
-            if (options[index]) {
-                actualCorrectText = options[index].textContent.trim();
-            }
-        }
-
-        options.forEach(opt => {
-            const isCorrectOption = opt.textContent.trim() === actualCorrectText;
-            const isSelected = opt === selected;
-
-            if (isCorrectOption) {
-                opt.classList.add("border-green-500", "bg-green-50");
-            } else if (isSelected) {
-                opt.classList.add("border-red-500", "bg-red-50");
-            }
+    questionEls.forEach((qEl, i) => {
+        const selected = qEl.querySelector(".border-blue-500");
+        answers.push({
+            question: currentQuizData[i].question,
+            topic: currentQuizData[i].topic,
+            selected_answer: selected ? selected.textContent.trim() : "",
+            correct_answer: currentQuizData[i].correct_answer,
         });
-
-        if (selected && selected.textContent.trim() === actualCorrectText) correct++;
     });
 
-    document.getElementById("quizScore").textContent = `Score: ${correct} / ${questions.length}`;
+    try {
+        const res = await fetch("/chat/quiz/submit", {
+            method: "POST",
+            headers: { ...authHeaders(), "Content-Type": "application/json" },
+            body: JSON.stringify({ document_id: documentId, difficulty, answers }),
+        });
+
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.detail || "Could not submit quiz");
+        }
+
+        const data = await res.json();
+        showQuizResults(data);
+    } catch (e) {
+        alert(e.message);
+    }
+}
+
+function showQuizResults(data) {
+    document.getElementById("quizOutput").innerHTML = "";
+    const results = document.getElementById("quizResults");
+    results.classList.remove("hidden");
+
+    results.innerHTML = `
+        <div class="text-center mb-4">
+            <p class="text-3xl font-bold text-blue-600">${data.score_percentage}%</p>
+            <p class="text-gray-500 text-sm">${data.correct_answers} / ${data.total_questions} correct</p>
+        </div>
+        <div style="max-width: 360px; margin: 0 auto;">
+            <canvas id="topicChart"></canvas>
+        </div>
+    `;
+
+    const topics = Object.keys(data.topic_breakdown);
+    const correctData = topics.map(t => data.topic_breakdown[t].correct);
+    const totalData = topics.map(t => data.topic_breakdown[t].total);
+    const percentages = topics.map((t, i) => Math.round((correctData[i] / totalData[i]) * 100));
+
+    const ctx = document.getElementById("topicChart").getContext("2d");
+    new Chart(ctx, {
+        type: "pie",
+        data: {
+            labels: topics.map((t, i) => `${t} (${correctData[i]}/${totalData[i]})`),
+            datasets: [{
+                data: percentages,
+                backgroundColor: [
+                    "#3B82F6", "#10B981", "#F59E0B", "#EF4444",
+                    "#8B5CF6", "#EC4899", "#14B8A6", "#F97316"
+                ],
+            }],
+        },
+        options: {
+            plugins: {
+                legend: { position: "bottom", labels: { font: { size: 11 } } },
+            },
+        },
+    });
 }

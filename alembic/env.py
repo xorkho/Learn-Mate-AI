@@ -19,6 +19,7 @@ from app.config import settings
 from app.models.user import User  # noqa: F401
 from app.models.documents import Document
 from app.models.chat_message import ChatMessage
+from app.models.quiz_attempt import QuizAttempt
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

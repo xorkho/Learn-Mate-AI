@@ -16,3 +16,7 @@ def workspace_page(request: Request, document_id: int):
         "workspace.html",
         {"request": request, "document_id": document_id},
     )
+
+@router.get("/progress")
+def progress_page(request: Request):
+    return templates.TemplateResponse("progress.html", {"request": request})
