@@ -3,29 +3,37 @@
 {% block title %}Sign Up{% endblock %}
 
 {% block content %}
-<div class="max-w-sm mx-auto mt-10">
-    <div class="bg-white shadow rounded-lg p-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">Create Account</h2>
+<div class="min-h-[calc(100vh-73px)] flex items-center justify-center px-6 py-12 bg-slate-50">
+    <div class="w-full max-w-sm">
 
-        <div id="errorBox" class="hidden bg-red-100 text-red-700 text-sm px-3 py-2 rounded mb-3"></div>
-        <div id="successBox" class="hidden bg-green-100 text-green-700 text-sm px-3 py-2 rounded mb-3"></div>
+        <div class="text-center mb-8">
+            <span class="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-brand-600 text-white font-display font-bold text-lg shadow-sm shadow-brand-600/30 mb-4">SA</span>
+            <h2 class="font-display text-2xl font-semibold text-slate-800">Create your account</h2>
+            <p class="text-slate-500 text-sm mt-1">Start chatting with your documents in minutes.</p>
+        </div>
 
-        <label class="block text-sm text-gray-600 mb-1">Email</label>
-        <input type="email" id="email"
-               class="w-full border border-gray-300 rounded-md px-3 py-2 mb-3 text-sm">
+        <div class="bg-white shadow-sm ring-1 ring-slate-200 rounded-xl p-6">
 
-        <label class="block text-sm text-gray-600 mb-1">Password</label>
-        <input type="password" id="password"
-               class="w-full border border-gray-300 rounded-md px-3 py-2 mb-4 text-sm">
+            <div id="errorBox" class="hidden bg-red-50 text-red-600 text-sm px-3 py-2.5 rounded-lg mb-4"></div>
+            <div id="successBox" class="hidden bg-emerald-50 text-emerald-600 text-sm px-3 py-2.5 rounded-lg mb-4"></div>
 
-        <button onclick="signup()"
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-md transition">
-            Sign Up
-        </button>
+            <label class="block text-xs font-medium text-slate-600 mb-1.5">Email</label>
+            <input type="email" id="email" placeholder="you@example.com"
+                   class="w-full border border-slate-300 rounded-lg px-3 py-2.5 mb-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-shadow">
 
-        <p class="text-sm text-gray-500 mt-4 text-center">
-            Already have an account? <a href="/login" class="text-blue-600 underline">Login</a>
-        </p>
+            <label class="block text-xs font-medium text-slate-600 mb-1.5">Password</label>
+            <input type="password" id="password" placeholder="At least 8 characters"
+                   class="w-full border border-slate-300 rounded-lg px-3 py-2.5 mb-5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-shadow">
+
+            <button onclick="signup()"
+                    class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-2.5 rounded-lg shadow-sm shadow-brand-600/20 transition-colors">
+                Create account
+            </button>
+
+            <p class="text-sm text-slate-500 mt-5 text-center">
+                Already have an account? <a href="/login" class="text-brand-600 hover:text-brand-700 font-medium">Sign in</a>
+            </p>
+        </div>
     </div>
 </div>
 

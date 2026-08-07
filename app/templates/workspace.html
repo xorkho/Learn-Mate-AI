@@ -2,34 +2,46 @@
 {% block title %}Workspace · Study Assistant{% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto px-6 py-10">
-    <a href="/dashboard" class="text-sm text-gray-500 hover:text-gray-700">&larr; Back to documents</a>
+<div class="max-w-5xl mx-auto px-6 sm:px-8 py-10">
+    <a href="/dashboard" class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to documents
+    </a>
 
     <div class="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 mt-4">
-        <div class="bg-white shadow rounded-lg p-5 h-fit">
-            <h3 id="docName" class="font-semibold text-gray-800 truncate">Loading...</h3>
-            <p id="docMeta" class="text-xs text-gray-400 mb-4"></p>
+        <div class="bg-white ring-1 ring-slate-200 rounded-xl p-5 h-fit">
+            <div class="flex items-center gap-2 mb-1">
+                <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                </span>
+                <h3 id="docName" class="font-medium text-slate-800 text-sm truncate">Loading...</h3>
+            </div>
+            <p id="docMeta" class="text-xs text-slate-400 mb-4 ml-9"></p>
             <div class="flex md:flex-col gap-1">
-                <button class="tab-btn text-left px-3 py-2 rounded-md text-sm font-medium bg-blue-50 text-blue-700" data-panel="chat" onclick="switchTab('chat')">Chat</button>
-                <button class="tab-btn text-left px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-50" data-panel="summary" onclick="switchTab('summary')">Summary</button>
-                <button class="tab-btn text-left px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-50" data-panel="quiz" onclick="switchTab('quiz')">Quiz</button>
+                <button class="tab-btn text-left px-3 py-2 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 transition-colors" data-panel="chat" onclick="switchTab('chat')">Chat</button>
+                <button class="tab-btn text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-slate-50 transition-colors" data-panel="summary" onclick="switchTab('summary')">Summary</button>
+                <button class="tab-btn text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-slate-50 transition-colors" data-panel="quiz" onclick="switchTab('quiz')">Quiz</button>
             </div>
         </div>
 
         <div>
             <!-- CHAT PANEL -->
             <div class="panel" id="panel-chat">
-                <div class="bg-white shadow rounded-lg p-5 flex flex-col" style="min-height: 480px;">
+                <div class="bg-white ring-1 ring-slate-200 rounded-xl p-5 flex flex-col" style="min-height: 480px;">
                     <div class="flex-1 overflow-y-auto flex flex-col gap-3 mb-4" style="max-height: 460px;" id="chatLog">
-                        <div class="bg-gray-100 text-gray-700 rounded-lg px-4 py-3 text-sm max-w-[80%]">
+                        <div class="bg-slate-100 text-slate-700 rounded-lg px-4 py-3 text-sm max-w-[80%]">
                             Ask me anything about this document — I'll answer using its content.
                         </div>
                     </div>
-                    <div class="flex gap-2 border-t border-gray-100 pt-3">
+                    <div class="flex gap-2 border-t border-slate-100 pt-3">
                         <input type="text" id="chatInput" placeholder="e.g. What are the key skills mentioned?"
-                               class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                               class="flex-1 border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-shadow">
                         <button id="sendBtn" onclick="sendMessage()"
-                                class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-md transition">
+                                class="bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg shadow-sm shadow-brand-600/20 transition-colors">
                             Send
                         </button>
                     </div>
@@ -38,35 +50,35 @@
 
             <!-- SUMMARY PANEL -->
             <div class="panel hidden" id="panel-summary">
-                <div class="bg-white shadow rounded-lg p-6">
+                <div class="bg-white ring-1 ring-slate-200 rounded-xl p-6">
                     <button id="summarizeBtn" onclick="generateSummary()"
-                            class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-md transition">
-                        Generate Summary
+                            class="bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg shadow-sm shadow-brand-600/20 transition-colors">
+                        Generate summary
                     </button>
-                    <div id="summaryOutput" class="mt-5 text-sm text-gray-700 leading-relaxed prose prose-sm max-w-none"></div>
+                    <div id="summaryOutput" class="mt-5 text-sm text-slate-700 leading-relaxed prose prose-sm max-w-none"></div>
                 </div>
             </div>
 
             <!-- QUIZ PANEL -->
             <div class="panel hidden" id="panel-quiz">
-                <div class="bg-white shadow rounded-lg p-6">
-                    <div id="quizSetup" class="flex flex-wrap items-center gap-4">
+                <div class="bg-white ring-1 ring-slate-200 rounded-xl p-6">
+                    <div id="quizSetup" class="flex flex-wrap items-end gap-4">
                         <div>
-                            <label class="text-sm text-gray-600 block mb-1">Difficulty</label>
-                            <select id="quizDifficulty" class="border border-gray-300 rounded-md px-3 py-2 text-sm">
+                            <label class="text-xs font-medium text-slate-600 block mb-1.5">Difficulty</label>
+                            <select id="quizDifficulty" class="border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
                                 <option value="easy">Easy</option>
                                 <option value="medium" selected>Medium</option>
                                 <option value="hard">Hard</option>
                             </select>
                         </div>
                         <div>
-                            <label class="text-sm text-gray-600 block mb-1">Number of Questions</label>
+                            <label class="text-xs font-medium text-slate-600 block mb-1.5">Number of questions</label>
                             <input type="number" id="numQuestions" value="5" min="1" max="10"
-                                   class="w-20 border border-gray-300 rounded-md px-3 py-2 text-sm">
+                                   class="w-20 border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
                         </div>
                         <button id="quizBtn" onclick="generateQuiz()"
-                                class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-md transition self-end">
-                            Generate Quiz
+                                class="bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg shadow-sm shadow-brand-600/20 transition-colors">
+                            Generate quiz
                         </button>
                     </div>
                     <div id="quizOutput" class="mt-6"></div>

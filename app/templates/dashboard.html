@@ -2,17 +2,22 @@
 {% block title %}My Documents · Study Assistant{% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto px-6 py-10">
+<div class="max-w-5xl mx-auto px-6 sm:px-8 py-10">
     <div class="mb-8">
-        <h1 class="text-2xl font-bold text-gray-800">My Documents</h1>
-        <p class="text-gray-500 text-sm mt-1">Upload a PDF, then chat, summarize, or quiz yourself on it.</p>
+        <h1 class="font-display text-2xl font-semibold text-slate-800">My Documents</h1>
+        <p class="text-slate-500 text-sm mt-1">Upload a PDF or TXT file, then chat, summarize, or quiz yourself on it.</p>
     </div>
 
-    <div class="bg-white shadow rounded-lg p-6 mb-8">
+    <div class="bg-white shadow-sm ring-1 ring-slate-200 rounded-xl p-6 mb-10">
         <div id="dropzone"
-             class="border-2 border-dashed border-blue-300 rounded-md py-10 px-4 text-center cursor-pointer hover:bg-blue-50 transition">
-            <p class="text-gray-700 font-medium">Click to upload <span class="text-gray-400 font-normal">or drag a PDF here</span></p>
-            <p class="text-gray-400 text-xs mt-1">Max size 10MB · PDF only</p>
+             class="border-2 border-dashed border-brand-200 rounded-lg py-12 px-4 text-center cursor-pointer hover:border-brand-400 hover:bg-brand-50/50 transition-colors group">
+            <div class="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-brand-50 text-brand-600 group-hover:bg-brand-100 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 16V4m0 0L7 9m5-5l5 5M5 20h14" />
+                </svg>
+            </div>
+            <p class="text-slate-700 font-medium">Click to upload <span class="text-slate-400 font-normal">or drag a file here</span></p>
+            <p class="text-slate-400 text-xs mt-1.5">Max size 10MB · PDF or TXT</p>
             <input type="file" id="fileInput" accept=".pdf,.txt" class="hidden">
         </div>
         <div id="uploadStatus" class="mt-3 text-sm"></div>
@@ -55,7 +60,7 @@ async function uploadFile(file) {
         return;
     }
 
-    uploadStatus.innerHTML = `<p class="text-gray-500">Uploading and indexing "${file.name}"... this can take a moment.</p>`;
+    uploadStatus.innerHTML = `<p class="text-slate-500 flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-full border-2 border-brand-300 border-t-brand-600 animate-spin"></span>Uploading and indexing "${file.name}"... this can take a moment.</p>`;
 
     const formData = new FormData();
     formData.append("file", file);
@@ -72,7 +77,7 @@ async function uploadFile(file) {
             throw new Error(err.detail || "Upload failed");
         }
 
-        uploadStatus.innerHTML = `<p class="text-green-600">Uploaded successfully.</p>`;
+        uploadStatus.innerHTML = `<p class="text-emerald-600">Uploaded successfully.</p>`;
         fileInput.value = "";
         loadDocuments();
     } catch (e) {
@@ -87,20 +92,37 @@ async function loadDocuments() {
         const docs = await res.json();
 
         if (docs.length === 0) {
-            docGrid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-10">No documents yet — upload your first PDF above.</div>`;
+            docGrid.innerHTML = `
+                <div class="col-span-full text-center py-16">
+                    <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <p class="text-slate-400 text-sm">No documents yet — upload your first file above.</p>
+                </div>`;
             return;
         }
 
-        docGrid.innerHTML = docs.map(doc => `
-            <div class="bg-white shadow rounded-lg p-4 cursor-pointer hover:shadow-md transition" onclick="openWorkspace(${doc.id})">
-                <span class="inline-block text-xs font-medium text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full mb-2">PDF</span>
-                <p class="font-medium text-gray-800 break-words">${doc.original_filename}</p>
-                <div class="flex justify-between items-center text-xs text-gray-400 mt-2">
+        docGrid.innerHTML = docs.map(doc => {
+            const ext = doc.original_filename.split('.').pop().toUpperCase();
+            return `
+            <div class="bg-white shadow-sm ring-1 ring-slate-200 rounded-xl p-4 cursor-pointer hover:shadow-md hover:ring-brand-200 transition-all" onclick="openWorkspace(${doc.id})">
+                <div class="flex items-start justify-between mb-3">
+                    <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                    </span>
+                    <span class="text-[10px] font-semibold tracking-wide text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">${ext}</span>
+                </div>
+                <p class="font-medium text-slate-800 text-sm break-words leading-snug">${doc.original_filename}</p>
+                <div class="flex justify-between items-center text-xs text-slate-400 mt-3 pt-3 border-t border-slate-100">
                     <span>${(doc.file_size / 1024).toFixed(0)} KB</span>
-                    <span onclick="event.stopPropagation(); deleteDoc(${doc.id})" class="text-red-500 hover:text-red-700 cursor-pointer">Delete</span>
+                    <span onclick="event.stopPropagation(); deleteDoc(${doc.id})" class="text-red-400 hover:text-red-600 cursor-pointer font-medium">Delete</span>
                 </div>
             </div>
-        `).join("");
+        `}).join("");
     } catch (e) {
         docGrid.innerHTML = `<p class="text-red-600">${e.message}</p>`;
     }

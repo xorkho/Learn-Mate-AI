@@ -1,16 +1,16 @@
 const renderer = new marked.Renderer();
 renderer.link = (href, title, text) => {
-    return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">${text}</a>`;
+    return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="text-brand-600 underline">${text}</a>`;
 };
 marked.setOptions({ renderer });
 
 // ---------- Tabs ----------
 function switchTab(name) {
     document.querySelectorAll(".tab-btn").forEach(t => {
-        t.classList.remove("bg-blue-50", "text-blue-700");
+        t.classList.remove("bg-brand-50", "text-brand-700");
         t.classList.add("text-gray-600");
     });
-    document.querySelector(`.tab-btn[data-panel="${name}"]`).classList.add("bg-blue-50", "text-blue-700");
+    document.querySelector(`.tab-btn[data-panel="${name}"]`).classList.add("bg-brand-50", "text-brand-700");
     document.querySelector(`.tab-btn[data-panel="${name}"]`).classList.remove("text-gray-600");
 
     document.querySelectorAll(".panel").forEach(p => p.classList.add("hidden"));
@@ -48,10 +48,10 @@ chatInput.addEventListener("keydown", (e) => {
 function appendMessage(role, text, sources = null) {
     const div = document.createElement("div");
     if (role === "user") {
-        div.className = "bg-blue-600 text-white rounded-lg px-4 py-3 text-sm max-w-[80%] self-end";
+        div.className = "bg-brand-600 text-white rounded-lg px-4 py-3 text-sm max-w-[80%] self-end";
         div.textContent = text;   // user ka apna text, plain rakhna hai
     } else {
-        div.className = "bg-gray-100 text-gray-700 rounded-lg px-4 py-3 text-sm max-w-[80%] prose prose-sm max-w-none";
+        div.className = "bg-slate-100 text-slate-700 rounded-lg px-4 py-3 text-sm max-w-[80%] prose prose-sm max-w-none";
         div.innerHTML = marked.parse(text);   // ← markdown render karo
     }
 
@@ -96,7 +96,7 @@ async function sendMessage() {
     sendBtn.disabled = true;
 
     const loadingId = "loading-" + Date.now();
-    chatLog.insertAdjacentHTML("beforeend", `<div class="bg-gray-100 text-gray-500 rounded-lg px-4 py-3 text-sm max-w-[80%]" id="${loadingId}">Thinking...</div>`);
+    chatLog.insertAdjacentHTML("beforeend", `<div class="bg-slate-100 text-slate-500 rounded-lg px-4 py-3 text-sm max-w-[80%]" id="${loadingId}">Thinking...</div>`);
     chatLog.scrollTop = chatLog.scrollHeight;
 
     try {
@@ -197,14 +197,14 @@ function renderQuiz(questions, difficulty) {
             </div>
             <div class="flex flex-col gap-2">
                 ${q.options.map(opt => `
-                    <div class="quiz-option border border-gray-200 rounded-md px-3 py-2 text-sm cursor-pointer hover:border-blue-400 transition"
+                    <div class="quiz-option border border-gray-200 rounded-md px-3 py-2 text-sm cursor-pointer hover:border-brand-400 transition"
                          onclick="selectOption(${qi}, this)">${opt}</div>
                 `).join("")}
             </div>
         </div>
     `).join("") + `
         <button onclick="submitQuiz('${difficulty}')"
-                class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-md transition mt-2">
+                class="bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium px-4 py-2 rounded-md transition mt-2">
             Submit Quiz
         </button>
     `;
@@ -213,9 +213,9 @@ function renderQuiz(questions, difficulty) {
 function selectOption(qi, el) {
     const question = document.querySelector(`.quiz-question[data-qi="${qi}"]`);
     question.querySelectorAll(".quiz-option").forEach(o => {
-        o.classList.remove("border-blue-500", "bg-blue-50");
+        o.classList.remove("border-brand-500", "bg-brand-50");
     });
-    el.classList.add("border-blue-500", "bg-blue-50");
+    el.classList.add("border-brand-500", "bg-brand-50");
 }
 
 async function submitQuiz(difficulty) {
@@ -223,7 +223,7 @@ async function submitQuiz(difficulty) {
     const answers = [];
 
     questionEls.forEach((qEl, i) => {
-        const selected = qEl.querySelector(".border-blue-500");
+        const selected = qEl.querySelector(".border-brand-500");
         answers.push({
             question: currentQuizData[i].question,
             topic: currentQuizData[i].topic,
@@ -258,7 +258,7 @@ function showQuizResults(data) {
 
     results.innerHTML = `
         <div class="text-center mb-4">
-            <p class="text-3xl font-bold text-blue-600">${data.score_percentage}%</p>
+            <p class="text-3xl font-bold text-brand-600">${data.score_percentage}%</p>
             <p class="text-gray-500 text-sm">${data.correct_answers} / ${data.total_questions} correct</p>
         </div>
         <div style="max-width: 360px; margin: 0 auto;">
@@ -279,7 +279,7 @@ function showQuizResults(data) {
             datasets: [{
                 data: percentages,
                 backgroundColor: [
-                    "#3B82F6", "#10B981", "#F59E0B", "#EF4444",
+                    "#5546db", "#10B981", "#F59E0B", "#EF4444",
                     "#8B5CF6", "#EC4899", "#14B8A6", "#F97316"
                 ],
             }],
